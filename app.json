@@ -1,6 +1,5 @@
 {
   "expo": {
-    "name": "sumjo",
     "slug": "sumjo",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,13 +12,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.sumjo"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.sumjo"
     },
     "web": {
       "bundler": "metro",
@@ -27,7 +28,20 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-asset",
+
+        {
+          "assets": ["./assets/models/sumjo8su_float32.tflite"]
+        }
+      ],
+      [
+        "react-native-fast-tflite",
+        {
+          "enableCoreMLDelegate": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
