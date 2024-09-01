@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, Image as RNImage, Button, useWindowDimensions, Platform } from 'react-native';
-import { useTensorflowModel } from 'react-native-fast-tflite';
+import { Tensor, TensorflowModel, useTensorflowModel } from 'react-native-fast-tflite';
 import {
   launchImageLibrary,
 } from 'react-native-image-picker';
@@ -8,8 +8,10 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedView } from '@/components/ThemedView';
 import ImageResizer from '@bam.tech/react-native-image-resizer';
 import { convertToRGB } from 'react-native-image-to-rgb';
-import { Canvas, Rect, Text, Skia, SkImage, Image as SKImage, matchFont } from '@shopify/react-native-skia';
+import { Canvas, Rect, Text, Skia, SkImage, Image as SKImage, matchFont, Group, AlphaType, ColorType } from '@shopify/react-native-skia';
 import { Float } from 'react-native/Libraries/Types/CodegenTypes';
+//import RNImageManipulator from "@oguzhnatly/react-native-image-manipulator";
+import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
 
 const resizeImage = async (uri: string, width: number, height: number) => {
   try {
@@ -46,7 +48,7 @@ function intersection(box1: any, box2: any) {
 }
 
 function scale(maxWidth: number, maxHeight: number, srcWidth: number | undefined, srcHeight: number | undefined) {
-  if (!srcWidth || ! srcHeight) return { height: 0, width: 0 };
+  if (!srcWidth || !srcHeight) return { height: 0, width: 0 };
   let width = 0;
   let height = 0;
   if (srcWidth > srcHeight) {
@@ -83,8 +85,8 @@ function getColor(label: string) {
     case '0':
       return "lightblue";
       break;
-  
-    case 'n1': 
+
+    case 'n1':
     case 'n2':
       return "blue";
       break;
@@ -104,11 +106,23 @@ function getColor(label: string) {
     case '12':
       return "red";
       break;
-    
+
     default:
       return "yellow";
       break;
   }
+}
+
+function tensorToString(tensor: Tensor): string {
+  return ` - ${tensor.dataType} ${tensor.name}[${tensor.shape}]`;
+}
+
+function modelToString(model: TensorflowModel): string {
+  return (`
+  TFLite Model (${model.delegate}):
+  ${model.inputs.map(tensorToString).join('')} (inputs)
+  ${model.outputs.map(tensorToString).join('')} (outputs)
+  `);
 }
 
 export default function HomeScreen() {
@@ -116,57 +130,110 @@ export default function HomeScreen() {
   const actualModel = model.state === 'loaded' ? model.model : undefined;
   useEffect(() => {
     if (actualModel == null) return
-    console.log(`Model loaded!`);
   }, [actualModel]);
-  
+
   const [img, setImg] = useState<SkImage | null>();
   const [img2, setImg2] = useState<SkImage | null>();
   const [imgSize, setImgSize] = useState({ width: 0, height: 0 });
   const [img2Size, setImg2Size] = useState({ width: 0, height: 0 });
   const [boxes, setBoxes] = useState<any>([]);
+  const [array, setArray] = useState<any>();
+  const [imageSkia, setImageSkia] = useState<any>();
   const { height: wHeight, width: wWidth } = useWindowDimensions();
-  const detectionTreshold = .001;
+  const detectionTreshold = .2;
 
   console.log(`Model: ${model.state} (${model.model != null})`);
 
   useEffect(() => {
     if (!img) return;
     if (!img2) return;
-    setImgSize(scale(wWidth - 48, (wHeight /2) - 48, img?.width(), img?.height()));
-    setImg2Size(scale(wWidth - 48, (wHeight /2) - 48, img2?.width(), img2?.height()));
+    setImgSize(scale(wWidth - 48, (wHeight / 2) - 48, img?.width(), img?.height()));
+    setImg2Size(scale(wWidth - 48, (wHeight / 2) - 48, img2?.width(), img2?.height()));
   }, [img, img2]);
 
-  console.log(`Image size on screen: ${imgSize.width} ${imgSize.height}`);
-  console.log(`Image squared size on screen: ${img2Size.width} ${img2Size.height}`);
+  useEffect(() => {
+    /* if (!array) return;
+    const dataSkia = Skia.Data.fromBytes(array);
+    setImageSkia(Skia.Image.MakeImage(
+      {
+        width: 640,
+        height: 640,
+        alphaType: AlphaType.Opaque,
+        colorType: ColorType.RGB_565,
+      },
+      dataSkia,
+      640 * 3
+    )); */
+  }, [array]);
 
   const uploadImage = async () => {
-    launchImageLibrary({ mediaType: 'photo', maxHeight: 640, maxWidth: 640 },
+    launchImageLibrary({ mediaType: 'photo', maxHeight: 640, maxWidth: 640, quality: 1, includeBase64: true },
       async response => {
         if (!response.didCancel) {
           if (response.assets && response.assets.length > 0 && response.assets[0].uri) {
-            console.log(response.assets[0]?.uri);
             const data = await Skia.Data.fromURI(response.assets[0]?.uri);
             const image = Skia.Image.MakeImageFromEncoded(data);
             setImg(image);
-            console.log(image?.getImageInfo());
-            const resized = await resizeImage(response.assets[0].uri, 640, 640)
-            console.log(resized);
+            const resized = await resizeImage(response.assets[0].uri, 640, 640);
             if (!resized) return;
             const data2 = await Skia.Data.fromURI(resized);
             const image2 = Skia.Image.MakeImageFromEncoded(data2);
             setImg2(image2);
-            console.log(image2?.getImageInfo());
+            const RNImage = await manipulateAsync(
+              resized,
+              [{ rotate: 0 }],
+              { compress: 1, format: SaveFormat.JPEG }
+            );
+/* 
+            const RNImage = await RNImageManipulator.manipulate(
+              resized,
+              [{ rotate: 0 }, { flip: { vertical: false } }],
+              { format: "jpeg" }
+            ); */
+
             const convertedArray = await convertToRGB(resized);
-            console.log(convertedArray.length);
+            console.log({l: convertedArray.length})
+            const convertedArray3 = await convertToRGB(RNImage?.uri);
+            console.log({l3: convertedArray3.length})
+            
             let red = [];
             let blue = [];
             let green = [];
+            let a = [];
             for (let index = 0; index < convertedArray.length; index += 3) {
               red.push(convertedArray[index] / 255);
               green.push(convertedArray[index + 1] / 255);
               blue.push(convertedArray[index + 2] / 255);
+              if (index%(convertedArray.length / 640) == 0 || index == 0) {
+                /* console.log(convertedArray[index],
+                convertedArray[index + 1],
+                convertedArray[index + 2]) */
+              }
+              a.push(255);
             }
-            const finalArray = [ ...red, ...green, ...blue];
+            
+
+            const finalArray = [...red, ...green, ...blue];
+
+            const pixels = new Uint8Array(convertedArray);
+            setArray(pixels);
+
+            if (!RNImage?.uri) return;
+            const dataSkia = await Skia.Data.fromURI(RNImage?.uri);
+            const image3 = Skia.Image.MakeImageFromEncoded(dataSkia);
+            console.log(image3?.encodeToBytes().length,image3?.encodeToBytes()[0])
+            //const dataSkia = Skia.Data.fromBytes(array);
+            setImageSkia(image3/* Skia.Image.MakeImage(
+              {
+                width: 640,
+                height: 640,
+                alphaType: AlphaType.Opaque,
+                colorType: ColorType.RGBA_F32,
+              },
+              dataSkia,
+              640 * 4
+            ) */);
+
             const arrayBuffer = new Float32Array(finalArray);
             const result = actualModel?.runSync([arrayBuffer]);
             if (!result || result.length < 1) return;
@@ -174,7 +241,7 @@ export default function HomeScreen() {
             const numDetections = 8400;
             let boxes: any = [];
             const yolo_classes = ['0', '1', '10', '11', '12', '2', '3', '4', '5', '6', '7', '8', '9', 'n1', 'n2'];
-            const wh = scale(wWidth - 48, (wHeight /2) - 48, image?.width(), image?.height());
+            const wh = scale(wWidth - 48, (wHeight *.3) - 48, image?.width(), image?.height());
             for (let index = 0; index < numDetections; index++) {
               const [class_id, prob] =
                 [...Array(15).keys()].map((col) => {
@@ -186,78 +253,68 @@ export default function HomeScreen() {
                 continue;
               }
               const label = yolo_classes[Number(class_id)];
-              const xc = outputTensor[index] as Float;
-              const yc = outputTensor[numDetections + index] as Float;
+              const x = outputTensor[index] as Float;
+              const y = outputTensor[numDetections + index] as Float;
               const w = outputTensor[2 * numDetections + index] as Float;
               const h = outputTensor[3 * numDetections + index] as Float;
-
-              const x1 = (xc - (w / 2));
-              const y1 = (yc - (h / 2));
-              const x2 = (xc + (w / 2));
-              const y2 = (yc + (h / 2));
 
               boxes.push({
                 label,
                 prob,
                 xsize: {
-                  xc: xc, yc: yc, w: w, h: h
-                },
-                ycoordinate: {
-                  x1, y1, x2, y2
+                  x: x, y: y, w: w, h: h
                 },
               });
             }
 
             boxes = boxes.sort((boxA: any, boxB: any) => boxB.prob - boxA.prob);
-            //console.log(boxes);
-            
+
             const output = [];
+            setBoxes(boxes);
             while (boxes.length > 0) {
               output.push(boxes[0]);
-              boxes = boxes.filter((box: any) => boxes[0].label !== box.label);
+              boxes = boxes.filter((box: any) => /* iou(boxes[0].xsize, box.xsize) < 0.7 ||  */boxes[0].label !== box.label);
             }
-            setBoxes(output);
-            console.log(output.length)
           }
         } else {
           console.log(response.errorMessage);
         }
       });
   };
+  console.log(img?.getImageInfo());
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
       headerImage={
-        <RNImage 
+        <RNImage
           source={require('@/assets/images/partial-react-logo.png')}
           style={styles.reactLogo}
         />
       }>
-      <ThemedView style={{flex: 1, alignItems: 'center'}}>
+      <ThemedView style={{ flex: 1, alignItems: 'center' }}>
         <Button title='Launch gallery' onPress={uploadImage} />
-        {img && boxes &&
-          <Canvas style={{ width: imgSize.width, height: imgSize.height, borderColor: 'red', borderWidth: 1 }}>
-            <SKImage image={img} fit='contain' x={0} y={0} width={imgSize.width} height={imgSize.height} />
-            {/* {boxes.map((box: any) => 
-              <Rect x={(box.ycoordinate.x2 * imgSize.width)} y={(box.ycoordinate.y2 * imgSize.height)} width={5} height={5} color="red" opacity={box.prob}/>
-            )} */}
-          </Canvas>
-        }
         {img2 && boxes &&
           <Canvas style={{ width: img2Size.width, height: img2Size.height, borderColor: 'pink', borderWidth: 1 }}>
             <SKImage image={img2} fit='contain' x={0} y={0} width={img2Size.width} height={img2Size.height} />
-            {boxes.map((box: any) => 
-              <>
-                <Text color={getColor(box.label)} text={box.label} x={(box.xsize.xc * 640)} y={((box.xsize.yc * 640) - 4)} font={font} />
-                <Rect x={(box.xsize.xc * 640)} y={(box.xsize.yc * 640)} width={box.xsize.w * 640} height={box.xsize.h * 640} strokeCap='square' strokeWidth={2} strokeMiter={3} strokeJoin={'round'} style='stroke' color={getColor(box.label)} opacity={box.prob} />
-              </>
+            {boxes.map((box: any, index: number) =>
+              <Group key={`detection-box-${index}-${box.label}`}>
+                <Text color={getColor(box.label)} text={box.label} x={(box.xsize.x * 300)} y={((box.xsize.y * 300) - 4)} font={font} />
+                <Rect x={(box.xsize.x * 300)} y={(box.xsize.y * 300)} width={box.xsize.w * 300} height={box.xsize.h * 300} strokeCap='square' strokeWidth={2} strokeMiter={3} strokeJoin={'round'} style='stroke' color={getColor(box.label)} opacity={box.prob} />
+              </Group>
             )}
-            {/* {boxes.map((box: any) => 
-              <Rect x={(box.ycoordinate.x1 * img2Size.width)} y={(box.ycoordinate.y1 * img2Size.height)} width={5} height={5} color="blue" opacity={box.prob}/>
-            )}
-            {boxes.map((box: any) => 
-              <Rect x={(box.ycoordinate.x2 * img2Size.width)} y={(box.ycoordinate.y2 * img2Size.height)} width={5} height={5} color="red" opacity={box.prob}/>
-            )} */}
+          </Canvas>
+        }
+          
+        {imageSkia && boxes &&
+          <Canvas style={{ width: img2Size.width, height: img2Size.height, borderColor: 'pink', borderWidth: 1 }}>
+            <SKImage image={imageSkia} fit='contain' x={0} y={0} width={img2Size.width} height={img2Size.height} />
+          </Canvas>
+        }
+
+        {img && boxes &&
+          <Canvas style={{ width: imgSize.width, height: imgSize.height, borderColor: 'pink', borderWidth: 1 }}>
+            <SKImage image={img} fit='contain' x={0} y={0} width={imgSize.width} height={imgSize.height} />
           </Canvas>
         }
       </ThemedView>
