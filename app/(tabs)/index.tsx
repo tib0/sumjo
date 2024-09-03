@@ -29,6 +29,36 @@ function iou(box1: any, box2: any) {
   return res;
 }
 
+function RGBAtoRGB(
+  r: number, 
+  g: number, 
+  b: number, 
+  a: number, 
+  r2: number, 
+  g2: number, 
+  b2: number
+){
+  console.log(
+    r,
+    g,
+    b,
+    a,
+    r2,
+    g2,
+    b2
+  )
+  const al = 1 - a
+  const r3 = Math.round((a * (r) + (al * (r2))) * 255);
+  const g3 = Math.round((a * (g) + (al * (g2))) * 255);
+  const b3 = Math.round((a * (b) + (al * (b2))) * 255);
+
+  return [
+    r3, 
+    g3, 
+    b3
+  ];
+} 
+
 function union(box1: any, box2: any) {
   const { x1: box1_x1, y1: box1_y1, x2: box1_x2, y2: box1_y2 } = box1;
   const { x1: box2_x1, y1: box2_y1, x2: box2_x2, y2: box2_y2 } = box2;
@@ -152,89 +182,116 @@ export default function HomeScreen() {
   }, [img, img2]);
 
   useEffect(() => {
-    /* if (!array) return;
-    const dataSkia = Skia.Data.fromBytes(array);
-    setImageSkia(Skia.Image.MakeImage(
+    if (!array) return;
+    const dataSkia = Skia.Data.fromBytes(array);  
+    const image = Skia.Image.MakeImage(
       {
         width: 640,
         height: 640,
-        alphaType: AlphaType.Opaque,
-        colorType: ColorType.RGB_565,
+        colorType: ColorType.RGB_565,   //ColorType.RGBA_8888,   //ColorType.RGB_565,
+        alphaType:AlphaType.Opaque,
       },
       dataSkia,
       640 * 3
-    )); */
+    );
+    
+    // const imageRGBA = Skia.Image.MakeImage(
+    //   {
+    //     width: 640,
+    //     height: 640,
+    //     colorType: ColorType.RGBA_8888,   //ColorType.RGBA_8888,   //ColorType.RGB_565,
+    //     alphaType:AlphaType.Opaque,
+    //   },
+    //   dataSkia,
+    //   640 * 4
+    // );
+
+    console.log('useEffect', image?.width(), image?.height())
+    console.log('useEffect', array.length)
+    setImageSkia(image);
   }, [array]);
 
   const uploadImage = async () => {
-    launchImageLibrary({ mediaType: 'photo', maxHeight: 640, maxWidth: 640, quality: 1, includeBase64: true },
+    launchImageLibrary({ mediaType: 'photo'/* , maxHeight: 640, maxWidth: 640 */, quality: 1, includeBase64: true },
       async response => {
         if (!response.didCancel) {
           if (response.assets && response.assets.length > 0 && response.assets[0].uri) {
             const data = await Skia.Data.fromURI(response.assets[0]?.uri);
             const image = Skia.Image.MakeImageFromEncoded(data);
+            if (!image) return;
+            console.log('uploadImage 1', image?.width(),image?.height())
             setImg(image);
             const resized = await resizeImage(response.assets[0].uri, 640, 640);
             if (!resized) return;
             const data2 = await Skia.Data.fromURI(resized);
             const image2 = Skia.Image.MakeImageFromEncoded(data2);
+            if (!image2) return;
+            console.log('uploadImage 2', image2?.width(),image2?.height())
             setImg2(image2);
-            const RNImage = await manipulateAsync(
-              resized,
-              [{ rotate: 0 }],
-              { compress: 1, format: SaveFormat.JPEG }
-            );
-/* 
-            const RNImage = await RNImageManipulator.manipulate(
-              resized,
-              [{ rotate: 0 }, { flip: { vertical: false } }],
-              { format: "jpeg" }
-            ); */
-
-            const convertedArray = await convertToRGB(resized);
-            console.log({l: convertedArray.length})
-            const convertedArray3 = await convertToRGB(RNImage?.uri);
-            console.log({l3: convertedArray3.length})
+            const pixels2 = image2.readPixels(0, 0, image2.getImageInfo());
+            if (!pixels2) return;
             
-            let red = [];
-            let blue = [];
-            let green = [];
+            // const RNImage = await manipulateAsync(
+            //   resized,
+            //   [{resize: { width: 640, height: 640 }}],
+            //   { compress: 1, format: SaveFormat.JPEG, base64: true }
+            // );
+
+            // const convertedArray = await convertToRGB(RNImage.uri);
+            // const resized3 = await resizeImage(RNImage?.uri, 640, 640);
+            // if (!resized3) return; 
+            // const convertedArray3 = await convertToRGB(resized3);
+            
             let a = [];
-            for (let index = 0; index < convertedArray.length; index += 3) {
-              red.push(convertedArray[index] / 255);
-              green.push(convertedArray[index + 1] / 255);
-              blue.push(convertedArray[index + 2] / 255);
-              if (index%(convertedArray.length / 640) == 0 || index == 0) {
-                /* console.log(convertedArray[index],
-                convertedArray[index + 1],
-                convertedArray[index + 2]) */
+            let oRGBA = [];
+            let oRGB = [];
+            let oR = [];
+            let oG = [];
+            let oB = [];
+            let oR2 = [];
+            let oG2 = [];
+            let oB2 = [];
+          
+            for (let index = 0; index < pixels2.length; index += 4) {
+              oRGBA.push(pixels2[index]);
+              oRGBA.push(pixels2[index + 1]);
+              oRGBA.push(pixels2[index + 2]);
+              oRGBA.push(pixels2[index + 3]);
+
+              oRGB.push(pixels2[index]);
+              oRGB.push(pixels2[index + 1]);
+              oRGB.push(pixels2[index + 2]);
+
+              oR.push((pixels2[index] / 255) as Float);
+              oG.push((pixels2[index + 1] / 255) as Float);
+              oB.push((pixels2[index + 2] / 255) as Float);
+
+              oR2.push(pixels2[index]);
+              oG2.push(pixels2[index + 1]);
+              oB2.push(pixels2[index + 2]);
+
+              a.push((pixels2[index + 3] / 255) as Float);
+
+              if (index%42000 == 0 || index == 0) {
+                console.log(
+                  pixels2[index],
+                  pixels2[index + 1],
+                  pixels2[index + 2],
+                  pixels2[index + 3]
+                );
               }
-              a.push(255);
             }
             
-
-            const finalArray = [...red, ...green, ...blue];
-
-            const pixels = new Uint8Array(convertedArray);
+            const finalArray = [...oR, ...oG, ...oB];
+            const pixels = new Uint8Array(oRGB);
             setArray(pixels);
-
-            if (!RNImage?.uri) return;
-            const dataSkia = await Skia.Data.fromURI(RNImage?.uri);
-            const image3 = Skia.Image.MakeImageFromEncoded(dataSkia);
-            console.log(image3?.encodeToBytes().length,image3?.encodeToBytes()[0])
-            //const dataSkia = Skia.Data.fromBytes(array);
-            setImageSkia(image3/* Skia.Image.MakeImage(
-              {
-                width: 640,
-                height: 640,
-                alphaType: AlphaType.Opaque,
-                colorType: ColorType.RGBA_F32,
-              },
-              dataSkia,
-              640 * 4
-            ) */);
-
+            console.log('pixels[0]', pixels[0])
+            console.log(oRGB.length)
+            console.log('oRGB[0]', oRGB[0])
+            console.log(pixels.length)
             const arrayBuffer = new Float32Array(finalArray);
+            console.log(arrayBuffer[0])
+            console.log(arrayBuffer.length)
             const result = actualModel?.runSync([arrayBuffer]);
             if (!result || result.length < 1) return;
             const outputTensor = result[0];
@@ -281,7 +338,6 @@ export default function HomeScreen() {
         }
       });
   };
-  console.log(img?.getImageInfo());
 
   return (
     <ParallaxScrollView
