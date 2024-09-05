@@ -11,7 +11,7 @@ export async function resizeImage(uri: string, width: number, height: number) {
   }
 };
 
-export async function getRGBArrayFromUri(uri: string, outputFactor?: number): Promise<Array<number>> {
+export async function getRGBArrayFromUri(uri: string, outputFactor?: number): Promise<number[]> {
   const data = await Skia.Data.fromURI(uri);
   const image = Skia.Image.MakeImageFromEncoded(data);
   if (!image) return [];

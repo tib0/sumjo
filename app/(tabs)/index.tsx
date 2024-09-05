@@ -25,14 +25,14 @@ export default function HomeScreen() {
   const [imgSize, setImgSize] = 
     useState({ width: 0, height: 0 });
   const [boxes, setBoxes] = 
-    useState<Array<DetectionBox>>([]);
+    useState<DetectionBox[]>([]);
   const { height: wHeight, width: wWidth } = 
     useWindowDimensions();
 
   useEffect(() => {
     if (!img) return;
     setImgSize(scale(wWidth - 48, (wHeight / 2) - 48, img?.width(), img?.height()));
-  }, [img]);
+  }, [img, wWidth, wHeight]);
 
   const uploadImage = async () => {
     launchImageLibrary({ mediaType: 'photo', quality: 1, includeBase64: true },

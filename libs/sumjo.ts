@@ -9,9 +9,6 @@ export function getColor(label: string) {
     case 'n2':
       return "blue";
 
-    case '0':
-      return "lightblue";
-
     case '1':
     case '2':
     case '3':
@@ -27,7 +24,7 @@ export function getColor(label: string) {
   }
 }
 
-export function sum(results: Array<DetectionBox>) {
+export function sum(results: DetectionBox[]) {
   let sum = 0;
   results.map((res: any) => { sum += Number.parseInt(res.label.replace('n', '-')) });
   return sum;

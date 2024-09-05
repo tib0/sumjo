@@ -26,7 +26,7 @@ export async function performDetectionFromUri(model: TensorflowModel, uri: strin
   if (!result || result.length < 1) return;
   const outputTensor = result[0];
   const numDetections = 8400;
-  let boxes: Array<DetectionBox> = [];
+  let boxes: DetectionBox[] = [];
   for (let index = 0; index < numDetections; index++) {
     const [class_id, prob] =
       [...Array(15).keys()].map((col) => {
