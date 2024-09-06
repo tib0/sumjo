@@ -30,6 +30,12 @@
     "plugins": [
       "expo-router",
       [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "Sumjo needs access to your Camera."
+        }
+      ],
+      [
         "expo-asset",
 
         {
@@ -40,6 +46,14 @@
         "react-native-fast-tflite",
         {
           "enableCoreMLDelegate": true
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 34
+          }
         }
       ]
     ],

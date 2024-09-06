@@ -16,14 +16,20 @@ export function modelToString(model: TensorflowModel): string {
   `);
 }
 
-export async function performDetectionFromUri(model: TensorflowModel, uri: string): Promise<any> {
+export async function performDetectionFromUri(model: TensorflowModel, uri: string): Promise<DetectionBox[]> {
   const resized = await resizeImage(uri, 640, 640);
-  if (!resized) return;
+  if (!resized) return [];
   const oRGB = await getRGBArrayFromUri(resized);
-  if (!oRGB || oRGB.length < 1) return;
+  if (!oRGB || oRGB.length < 1) return [];
   const arrayBuffer = new Float32Array(oRGB);
+
+  return performDetectionFromArray(model, arrayBuffer);
+}
+
+export function performDetectionFromArray(model: TensorflowModel, arrayBuffer: Float32Array): DetectionBox[] { 
+  'worklet'
   const result = model?.runSync([arrayBuffer]);
-  if (!result || result.length < 1) return;
+  if (!result || result.length < 1) return [];
   const outputTensor = result[0];
   const numDetections = 8400;
   let boxes: DetectionBox[] = [];
