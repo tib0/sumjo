@@ -9,7 +9,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { SumjoModelContext } from '@/context/SumjoModelContext';
 import { scale } from '@/libs/pixel';
 import { getColor, sum } from '@/libs/sumjo';
-import { Font } from '@/constants/Font';
+import { FONT } from '@/constants/Font';
 import { performDetectionFromUri } from '@/libs/model';
 import { DetectionBox } from '@/types/Sumjo';
 
@@ -75,7 +75,7 @@ export default function HomeScreen() {
                   color={'black'} 
                   text={box.label} x={(box.xSize.x + (box.xSize.w / 3)) * imgSize.width - 7} 
                   y={((box.xSize.y + (box.xSize.h / 2)) * imgSize.height - 4)} 
-                  font={Font} 
+                  font={FONT} 
                 />
                 <Rect 
                   x={(box.xSize.x - box.xSize.w / 2) * imgSize.width} y={(box.xSize.y - box.xSize.h / 2) * imgSize.height} 

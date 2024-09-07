@@ -1,7 +1,7 @@
 import { type Tensor, type TensorflowModel } from "react-native-fast-tflite";
 import { getRGBArrayFromUri, resizeImage } from "./image";
 import { iou } from "./pixel";
-import { SumjoClasses, SumjoTreshold } from "@/constants/Sumjo";
+import { SUMJO_CLASSES, SUMJO_TRESHOLD } from "@/constants/Sumjo";
 import { DetectionBox } from "@/types/Sumjo";
 
 export function tensorToString(tensor: Tensor): string {
@@ -33,7 +33,7 @@ export function performDetectionFromArray(model: TensorflowModel, arrayBuffer: F
   const outputTensor = result[0];
   const numDetections = 8400;
   let boxes: DetectionBox[] = [];
-  for (let index = 0; index < numDetections; index++) {
+   for (let index = 0; index < numDetections; index++) {
     const [class_id, prob] =
       [...Array(15).keys()].map((col) => {
         return [col, outputTensor[numDetections * (col + 4) + index]]
@@ -41,11 +41,11 @@ export function performDetectionFromArray(model: TensorflowModel, arrayBuffer: F
         item[1] > accum[1] ? item : accum
       );
 
-    if (prob < SumjoTreshold) {
+    if (prob < SUMJO_TRESHOLD) {
       continue;
     }
 
-    const label = SumjoClasses[Number(class_id)];
+    const label = SUMJO_CLASSES[Number(class_id)];
     const x = outputTensor[index] as number;
     const y = outputTensor[numDetections + index] as number;
     const w = outputTensor[2 * numDetections + index] as number;
@@ -76,6 +76,12 @@ export function performDetectionFromArray(model: TensorflowModel, arrayBuffer: F
   let output = [];
   while (boxes.length > 0) {
     output.push(boxes[0]);
+    boxes = boxes.map((box: DetectionBox) => {
+      if (iou(boxes[0].xCoordinate, box.xCoordinate) < 0.7 && boxes[0].label == box.label) {
+        boxes[0].prob = (boxes[0].prob + box.prob / 2);
+      }
+      return box;
+    })
     boxes = boxes.filter((box: DetectionBox) => {
       return iou(boxes[0].xCoordinate, box.xCoordinate) < 0.7 || boxes[0].label !== box.label;
     });

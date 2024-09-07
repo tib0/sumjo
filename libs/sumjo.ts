@@ -25,6 +25,7 @@ export function getColor(label: string) {
 }
 
 export function sum(results: DetectionBox[]) {
+  'worklet'
   let sum = 0;
   results.map((res: any) => { sum += Number.parseInt(res.label.replace('n', '-')) });
   return sum;
