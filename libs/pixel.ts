@@ -12,17 +12,17 @@ export function iou(box1: CoordBox, box2: CoordBox): number {
 
   const box1_area = (box1_x2 - box1_x1) * (box1_y2 - box1_y1);
   const box2_area = (box2_x2 - box2_x1) * (box2_y2 - box2_y1);
-  
+
   return ((x2 - x1) * (y2 - y1)) / (box1_area + box2_area - ((x2 - x1) * (y2 - y1)));
 }
 
 export function scale(
-  maxWidth: number, 
-  maxHeight: number, 
-  srcWidth: number | undefined, 
+  maxWidth: number,
+  maxHeight: number,
+  srcWidth: number | undefined,
   srcHeight: number | undefined
-) : { 
-  width: number, height: number 
+): {
+  width: number, height: number
 } {
   if (!srcWidth || !srcHeight) return { height: 0, width: 0 };
   let width = 0;
@@ -31,11 +31,22 @@ export function scale(
     if (srcWidth > maxWidth) {
       height = Math.round(srcHeight * (maxWidth / srcWidth));
       width = Math.round(maxWidth);
+    } else {
+      width = Math.round(maxWidth);
+      height = Math.round(maxHeight);
     }
   } else {
     if (srcHeight > maxHeight) {
       width = Math.round(srcWidth * (maxHeight / srcHeight));
       height = Math.round(maxHeight);
+    } else {
+      if (srcHeight > srcWidth) {
+        width = Math.round(maxWidth * (maxHeight / srcHeight));
+        height = Math.round(maxHeight);
+      } else {
+        width = Math.round(maxWidth);
+        height = Math.round(maxHeight * (maxWidth / srcWidth));
+      }
     }
   }
 

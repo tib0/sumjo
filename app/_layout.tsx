@@ -23,7 +23,6 @@ export default function RootLayout() {
     if (!fontLoaded) return;
     if (!model) return;
     if (model.state !== 'loaded') return;
-    console.info(modelToString(model.model));
     SplashScreen.hideAsync();
   }, [fontLoaded, model]);
 
@@ -35,7 +34,7 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <SumjoModelContext.Provider value={model}>
         <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
       </SumjoModelContext.Provider>

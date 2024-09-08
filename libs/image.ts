@@ -17,7 +17,7 @@ export async function getRGBArrayFromUri(uri: string, outputFactor?: number): Pr
   if (!image) return [];
   const pixelsResized = image.readPixels(0, 0, image.getImageInfo());
   if (!pixelsResized) return [];
-  
+
   let oRGB = [];
   try {
     for (let index = 0; index < pixelsResized.length; index += 4) {
@@ -30,5 +30,4 @@ export async function getRGBArrayFromUri(uri: string, outputFactor?: number): Pr
     console.error(err);
     return [];
   }
-
 } 
