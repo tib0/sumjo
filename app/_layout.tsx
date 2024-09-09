@@ -8,7 +8,6 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { useTensorflowModel } from 'react-native-fast-tflite';
 import { SumjoModelContext } from '@/context/SumjoModelContext';
-import { modelToString } from '@/libs/model';
 
 SplashScreen.preventAutoHideAsync();
 

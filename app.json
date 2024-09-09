@@ -32,7 +32,7 @@
       [
         "react-native-vision-camera",
         {
-          "cameraPermissionText": "Sumjo needs access to your Camera."
+          "cameraPermissionText": "Sumjo app needs access to your Camera."
         }
       ],
       [
@@ -46,6 +46,14 @@
         "react-native-fast-tflite",
         {
           "enableCoreMLDelegate": true
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow Sumjo app to access your photos.",
+          "savePhotosPermission": "Allow Sumjo app to save photos.",
+          "isAccessMediaLocationEnabled": true
         }
       ],
       [

@@ -76,12 +76,12 @@ export function performDetectionFromArray(model: TensorflowModel, arrayBuffer: F
   let output = [];
   while (boxes.length > 0) {
     output.push(boxes[0]);
-    boxes = boxes.map((box: DetectionBox) => {
+    /* boxes = boxes.map((box: DetectionBox) => {
       if (iou(boxes[0].xCoordinate, box.xCoordinate) < 0.7 && boxes[0].label == box.label) {
         boxes[0].prob = (boxes[0].prob + box.prob / 2);
       }
       return box;
-    })
+    }) */
     boxes = boxes.filter((box: DetectionBox) => {
       return iou(boxes[0].xCoordinate, box.xCoordinate) < 0.7 || boxes[0].label !== box.label;
     });
