@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import {
   Camera as RNCamera,
+  type PhotoFile,
   useCameraDevice,
   useCameraPermission,
   CameraDevice,
@@ -55,15 +56,16 @@ function getBestFormat(
 export default function Index(): JSX.Element {
   const { hasPermission, requestPermission } = useCameraPermission();
   const [mediaPermissionResponse, mediaRequestPermission] = MediaLibrary.usePermissions();
+  const [isCameraEnabled, setIsCameraEnabled] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const position = 'back';
   const camera = useRef<RNCamera>(null)
-  const [isCameraEnabled, setIsCameraEnabled] = useState(true);
-  const [boxes, setBoxes] = useState<DetectionBox[]>([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const pixelFormat = Platform.OS == 'ios' ? 'rgb' : 'yuv';
   const device = useCameraDevice(position);
   const model = useContext(SumjoModelContext);
   const [score, setScore] = useState(0);
+  const [photo, setPhoto] = useState<PhotoFile | undefined>(undefined);
+  const [boxes, setBoxes] = useState<DetectionBox[]>([]);
+  const pixelFormat = Platform.OS == 'ios' ? 'rgb' : 'yuv';
   const cameraSize = scale(
     SCREEN_WIDTH - 40, 
     (SCREEN_HEIGHT / 1.5) - 40, 
@@ -81,7 +83,7 @@ export default function Index(): JSX.Element {
         setIsCameraEnabled(false);
       }
     }, [])
-  )
+  );
   useEffect(() => {
     if (!hasPermission) {
       RNCamera.requestCameraPermission();
@@ -100,14 +102,13 @@ export default function Index(): JSX.Element {
     if (!camera || !camera.current || !isCameraEnabled) return;
     
     const photo = await camera.current.takePhoto({ enableShutterSound: false });
-    console.log(photo.path);
+    //const photo2 = await camera.current.takeSnapshot();
     await MediaLibrary.saveToLibraryAsync(photo.path);
     const oBoxes = await performDetectionFromUri(model?.model as TensorflowModel, photo.path);
-    console.log(oBoxes.length);
     const s2 = sum(oBoxes);
-    console.log(s2);
 
     setBoxes(oBoxes);
+    setPhoto(photo);
     setScore(s2);
     setIsCameraEnabled(false);
     setIsModalVisible(true);
@@ -120,8 +121,9 @@ export default function Index(): JSX.Element {
         <Text style={styles(cameraSize).logo}>Sumjo</Text>
         {!hasPermission && <Text style={styles(cameraSize).text} onPress={requestPermission}>No Camera Permission.</Text>}
         {device == null && <Text style={styles(cameraSize).text}>No Camera Found.</Text>}
-
-        {hasPermission && device != null && (
+        {!mediaPermissionResponse?.granted && <Text style={styles(cameraSize).text} onPress={requestPermission}>No media access Permission.</Text>}
+        
+        {hasPermission && mediaPermissionResponse?.granted && device != null && (
           <View style={styles(cameraSize).cameraBox}>
             <RNCamera
               ref={camera}
@@ -129,6 +131,7 @@ export default function Index(): JSX.Element {
               device={device}
               photo={true}
               isActive={isCameraEnabled}
+              outputOrientation={'preview'}
               format={format}
               pixelFormat={pixelFormat}
               enableZoomGesture={false}
@@ -151,7 +154,7 @@ export default function Index(): JSX.Element {
           </View>
         </View>
 
-        <Modal animationType="slide" transparent={true} visible={isModalVisible}>
+        <Modal animationType='slide' transparent={true} visible={isModalVisible}>
           <TouchableOpacity style={styles(cameraSize).modalContainer} onPress={() => {
             setIsModalVisible(false);
             setIsCameraEnabled(true);
@@ -162,6 +165,8 @@ export default function Index(): JSX.Element {
                   <Text style={styles(cameraSize).title}>Your score:</Text>
                 </View>
                 <Text style={styles(cameraSize).result}>{score.toString()}</Text>
+                <Text style={styles(cameraSize).resultDetail}>{photo?.orientation.toString()}, {photo?.width}x{photo?.height}</Text>
+                
                 {boxes.map((box, index) =>
                   <Text 
                     key={'detection-' + index} 

@@ -3,6 +3,7 @@ import { getRGBArrayFromUri, resizeImage } from "./image";
 import { iou } from "./pixel";
 import { SUMJO_CLASSES, SUMJO_TRESHOLD } from "@/constants/Sumjo";
 import { DetectionBox } from "@/types/Sumjo";
+import * as MediaLibrary from 'expo-media-library';
 
 export function tensorToString(tensor: Tensor): string {
   return ` - ${tensor.dataType} ${tensor.name}[${tensor.shape}]`;
@@ -19,6 +20,7 @@ export function modelToString(model: TensorflowModel): string {
 export async function performDetectionFromUri(model: TensorflowModel, uri: string): Promise<DetectionBox[]> {
   const resized = await resizeImage(uri, 640, 640);
   if (!resized) return [];
+  await MediaLibrary.saveToLibraryAsync(resized);
   const oRGB = await getRGBArrayFromUri(resized);
   if (!oRGB || oRGB.length < 1) return [];
   const arrayBuffer = new Float32Array(oRGB);
