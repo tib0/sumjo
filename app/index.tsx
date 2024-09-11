@@ -60,21 +60,24 @@ export default function Index(): JSX.Element {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const position = 'back';
   const camera = useRef<RNCamera>(null)
-  const device = useCameraDevice(position);
+  const device = useCameraDevice(position,  {
+    physicalDevices: ['wide-angle-camera'], 
+ });
   const model = useContext(SumjoModelContext);
   const [score, setScore] = useState(0);
   const [photo, setPhoto] = useState<PhotoFile | undefined>(undefined);
   const [boxes, setBoxes] = useState<DetectionBox[]>([]);
   const pixelFormat = Platform.OS == 'ios' ? 'rgb' : 'yuv';
+  const format = useMemo(
+    () => (device != null ? getBestFormat(device, 720, 1280) : undefined),
+    [device],
+  );
+  console.log(format?.photoWidth, format?.photoHeight)
   const cameraSize = scale(
     SCREEN_WIDTH - 40, 
     (SCREEN_HEIGHT / 1.5) - 40, 
-    device?.formats[0].photoWidth, 
-    device?.formats[0].photoHeight
-  );
-  const format = useMemo(
-    () => (device != null ? getBestFormat(device, cameraSize.width, cameraSize.height) : undefined),
-    [device],
+    format?.photoWidth,
+    format?.photoHeight,
   );
   useFocusEffect(
     useCallback(() => {
@@ -102,11 +105,10 @@ export default function Index(): JSX.Element {
     if (!camera || !camera.current || !isCameraEnabled) return;
     
     const photo = await camera.current.takePhoto({ enableShutterSound: false });
-    //const photo2 = await camera.current.takeSnapshot();
     await MediaLibrary.saveToLibraryAsync(photo.path);
     const oBoxes = await performDetectionFromUri(model?.model as TensorflowModel, photo.path);
     const s2 = sum(oBoxes);
-
+    console.log(photo.metadata?.Orientation);
     setBoxes(oBoxes);
     setPhoto(photo);
     setScore(s2);

@@ -1,9 +1,11 @@
 import ImageResizer from '@bam.tech/react-native-image-resizer';
 import { Skia } from '@shopify/react-native-skia';
+import { Platform } from 'react-native';
 
 export async function resizeImage(uri: string, width: number, height: number) {
   try {
-    const response = await ImageResizer.createResizedImage(uri, width, height, 'JPEG', 100, 0, undefined, true, { mode: 'stretch' });
+    const rotation = Platform.OS == 'android' ? 90 : 0;
+    const response = await ImageResizer.createResizedImage(uri, width, height, 'JPEG', 100, rotation, undefined, false, { mode: 'stretch' });
     return response.uri;
   } catch (err) {
     console.error(err);

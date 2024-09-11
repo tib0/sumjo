@@ -27,7 +27,13 @@ export function scale(
   if (!srcWidth || !srcHeight) return { height: 0, width: 0 };
   let width = 0;
   let height = 0;
-  if (srcWidth > srcHeight) {
+  width = Math.round(maxWidth);
+  height = Math.round(maxHeight);
+  console.log(maxWidth,
+    maxHeight,
+    srcWidth,
+    srcHeight)
+  /* if (srcWidth > srcHeight) {
     if (srcWidth > maxWidth) {
       height = Math.round(srcHeight * (maxWidth / srcWidth));
       width = Math.round(maxWidth);
@@ -48,7 +54,7 @@ export function scale(
         height = Math.round(maxHeight * (maxWidth / srcWidth));
       }
     }
-  }
+  } */
 
   return {
     width,
