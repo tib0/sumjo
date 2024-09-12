@@ -9,7 +9,6 @@ import React, {
 import {
   Modal,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -17,7 +16,6 @@ import {
 } from 'react-native';
 import {
   Camera as RNCamera,
-  type PhotoFile,
   useCameraDevice,
   useCameraPermission,
   CameraDevice,
@@ -29,219 +27,69 @@ import { performDetectionFromUri } from '@/libs/model';
 import { type TensorflowModel } from 'react-native-fast-tflite';
 import { sum } from '@/libs/sumjo';
 import { PressableOpacity } from 'react-native-pressable-opacity'
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from '@/constants/Screen';
+import { CONTENT_SPACING_X, CONTENT_SPACING_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from '@/constants/Screen';
 import { scale } from '@/libs/pixel';
 import { DetectionBox } from '@/types/Sumjo';
 import * as MediaLibrary from 'expo-media-library';
+import { PHOTO_SRC_HEIGHT, PHOTO_SRC_WIDTH } from '@/constants/Image';
 
-function getBestFormat(
-  device: CameraDevice,
-  targetWidth: number,
-  targetHeight: number,
-): CameraDeviceFormat {
-  const size = targetWidth * targetHeight;
-  return device.formats.reduce((prev, curr) => {
-    const currentSize = curr.photoWidth * curr.photoHeight;
-    const diff = Math.abs(size - currentSize);
-
-    const previousSize = prev.photoWidth * prev.photoHeight;
-    const prevDiff = Math.abs(size - previousSize);
-    if (diff < prevDiff) {
-      return curr;
-    }
-    return prev;
-  }, device.formats[0]);
-}
-
-export default function Index(): JSX.Element {
-  const { hasPermission, requestPermission } = useCameraPermission();
-  const [mediaPermissionResponse, mediaRequestPermission] = MediaLibrary.usePermissions();
-  const [isCameraEnabled, setIsCameraEnabled] = useState(true);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const position = 'back';
-  const camera = useRef<RNCamera>(null)
-  const device = useCameraDevice(position,  {
-    physicalDevices: ['wide-angle-camera'], 
- });
-  const model = useContext(SumjoModelContext);
-  const [score, setScore] = useState(0);
-  const [photo, setPhoto] = useState<PhotoFile | undefined>(undefined);
-  const [boxes, setBoxes] = useState<DetectionBox[]>([]);
-  const pixelFormat = Platform.OS == 'ios' ? 'rgb' : 'yuv';
-  const format = useMemo(
-    () => (device != null ? getBestFormat(device, 720, 1280) : undefined),
-    [device],
-  );
-  console.log(format?.photoWidth, format?.photoHeight)
-  const cameraSize = scale(
-    SCREEN_WIDTH - 40, 
-    (SCREEN_HEIGHT / 1.5) - 40, 
-    format?.photoWidth,
-    format?.photoHeight,
-  );
-  useFocusEffect(
-    useCallback(() => {
-      setIsCameraEnabled(true);
-      return () => {
-        setIsCameraEnabled(false);
-      }
-    }, [])
-  );
-  useEffect(() => {
-    if (!hasPermission) {
-      RNCamera.requestCameraPermission();
-    }
-    if (!mediaPermissionResponse?.granted) {
-      mediaRequestPermission();
-    }
-  }, []);
-  useEffect(() => {
-    if (model?.model == null) {
-      return;
-    }
-  }, [model]);
-
-  async function takePhoto() {
-    if (!camera || !camera.current || !isCameraEnabled) return;
-    
-    const photo = await camera.current.takePhoto({ enableShutterSound: false });
-    await MediaLibrary.saveToLibraryAsync(photo.path);
-    const oBoxes = await performDetectionFromUri(model?.model as TensorflowModel, photo.path);
-    const s2 = sum(oBoxes);
-    console.log(photo.metadata?.Orientation);
-    setBoxes(oBoxes);
-    setPhoto(photo);
-    setScore(s2);
-    setIsCameraEnabled(false);
-    setIsModalVisible(true);
-  }
-
-  return (
-    <ScrollView style={styles(cameraSize).scrollContainer}>
-      <View style={styles(cameraSize).appContainer}>
-
-        <Text style={styles(cameraSize).logo}>Sumjo</Text>
-        {!hasPermission && <Text style={styles(cameraSize).text} onPress={requestPermission}>No Camera Permission.</Text>}
-        {device == null && <Text style={styles(cameraSize).text}>No Camera Found.</Text>}
-        {!mediaPermissionResponse?.granted && <Text style={styles(cameraSize).text} onPress={requestPermission}>No media access Permission.</Text>}
-        
-        {hasPermission && mediaPermissionResponse?.granted && device != null && (
-          <View style={styles(cameraSize).cameraBox}>
-            <RNCamera
-              ref={camera}
-              style={StyleSheet.absoluteFill}
-              device={device}
-              photo={true}
-              isActive={isCameraEnabled}
-              outputOrientation={'preview'}
-              format={format}
-              pixelFormat={pixelFormat}
-              enableZoomGesture={false}
-              onError={(err) => { console.log('RNCamera Error : ', err) }}
-            />
-          </View>
-        )}
-
-        <View style={styles(cameraSize).bottomButtonRow}>
-          <PressableOpacity style={styles(cameraSize).button} onPress={() => takePhoto()}>
-            <Text style={{ color: 'white', fontWeight: '900', fontSize: 46 / 2 }}>{'Get my score !'}</Text>
-          </PressableOpacity>
-          <View style={styles(cameraSize).bottomButtonRowSplit}>
-            <PressableOpacity style={styles(cameraSize).buttonSplit} onPress={() => takePhoto()}>
-              <Text style={{ color: 'white', fontWeight: '700', fontSize: 46 / 2 }}>{'About'}</Text>
-            </PressableOpacity>
-            <PressableOpacity style={styles(cameraSize).buttonSplit} onPress={() => takePhoto()}>
-              <Text style={{ color: 'white', fontWeight: '700', fontSize: 46 / 2 }}>{'History'}</Text>
-            </PressableOpacity>
-          </View>
-        </View>
-
-        <Modal animationType='slide' transparent={true} visible={isModalVisible}>
-          <TouchableOpacity style={styles(cameraSize).modalContainer} onPress={() => {
-            setIsModalVisible(false);
-            setIsCameraEnabled(true);
-          }} activeOpacity={.8}>
-            <TouchableOpacity style={styles(cameraSize).modal}>
-              <View style={styles(cameraSize).modalContent}>
-                <View style={styles(cameraSize).titleContainer}>
-                  <Text style={styles(cameraSize).title}>Your score:</Text>
-                </View>
-                <Text style={styles(cameraSize).result}>{score.toString()}</Text>
-                <Text style={styles(cameraSize).resultDetail}>{photo?.orientation.toString()}, {photo?.width}x{photo?.height}</Text>
-                
-                {boxes.map((box, index) =>
-                  <Text 
-                    key={'detection-' + index} 
-                    style={styles(cameraSize).resultDetail}
-                  >
-                    {box.label}: {Math.round(box.prob * 100)}%
-                  </Text>
-                )}
-              </View>
-            </TouchableOpacity>
-          </TouchableOpacity>
-        </Modal>
-
-      </View>
-    </ScrollView>
-  );
-}
-
-const styles = (cameraSize: { width: number, height: number }) => StyleSheet.create({
+const styleSheet = (cameraSize: { width: number, height: number }, paddingX: number, paddingY: number) => StyleSheet.create({
   appContainer: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    paddingHorizontal: 40 / 2,
-    paddingTop: 46,
+    display: 'flex',
+    justifyContent: 'space-between',
+    paddingHorizontal: paddingX,
+    paddingTop: paddingY,
     minHeight: '100%',
-    paddingVertical: 40 / 2,
+    paddingBottom: paddingY / 4,
+    backgroundColor: 'lightgreen'
   },
-  scrollContainer: {
-    flex: 1,
-    backgroundColor: 'lightgreen',
+  overlayTop: {
+    position: 'absolute',
+    top: '0%',
+    height: '20%',
+    width: '100%',
+    alignSelf: 'center',
+    zIndex: 1,
+    backgroundColor: 'black',
+    opacity: .6
+  },
+  overlayBottom: {
+    position: 'absolute',
+    top: '80%',
+    height: '20%',
+    width: '100%',
+    alignSelf: 'center',
+    zIndex: 1,
+    backgroundColor: 'black',
+    opacity: .6
   },
   logo: {
     color: 'black',
-    fontSize: 46 * 1.5,
-    lineHeight: 46 * 1.5,
+    fontSize: paddingY * 1.5,
+    lineHeight: paddingY * 1.5,
+    paddingBottom: paddingY / 2,
     fontWeight: '900',
     textAlign: 'center',
-    paddingBottom: 46 / 2,
   },
   cameraBox: {
-    width: cameraSize?.width || '95%',
-    height: cameraSize?.height || '95%',
-    borderRadius: 46 / 3,
+    flex: 4,
+    width: cameraSize.width,
+    height: cameraSize.height,
+    borderRadius: paddingY / 3,
     backgroundColor: 'black',
     overflow: 'hidden',
   },
   bottomButtonRow: {
     flex: 1,
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    paddingBottom: paddingY / 4,
   },
   button: {
-    marginTop: 46 / 2,
     width: '100%',
-    height: 46 * 1.5,
-    borderRadius: 46 / 3,
+    height: paddingY * 1.75,
+    borderRadius: paddingY / 3,
     backgroundColor: 'black',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  bottomButtonRowSplit: {
-    marginTop: 46 / 2,
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'stretch',
-    gap: 46 / 3
-  },
-  buttonSplit: {
-    height: 46 * 1,
-    borderRadius: 46 / 4,
-    flexGrow: 1,
-    backgroundColor: 'rgba(0,0,0,.75)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -291,3 +139,145 @@ const styles = (cameraSize: { width: number, height: number }) => StyleSheet.cre
     fontSize: 18,
   },
 });
+
+
+function getBestFormat(
+  device: CameraDevice,
+  targetWidth: number,
+  targetHeight: number,
+): CameraDeviceFormat {
+  const size = targetWidth * targetHeight;
+  return device.formats.reduce((prev, curr) => {
+    const currentSize = curr.photoWidth * curr.photoHeight;
+    const diff = Math.abs(size - currentSize);
+
+    const previousSize = prev.photoWidth * prev.photoHeight;
+    const prevDiff = Math.abs(size - previousSize);
+    if (diff < prevDiff) {
+      return curr;
+    }
+    return prev;
+  }, device.formats[0]);
+}
+
+export default function Index(): JSX.Element {
+  const { hasPermission, requestPermission } = useCameraPermission();
+  const [mediaPermissionResponse, mediaRequestPermission] = MediaLibrary.usePermissions();
+  const [isCameraEnabled, setIsCameraEnabled] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const position = 'back';
+  const camera = useRef<RNCamera>(null)
+  const device = useCameraDevice(position,  {
+    physicalDevices: ['wide-angle-camera'], 
+ });
+  const model = useContext(SumjoModelContext);
+  const [score, setScore] = useState(0);
+  const [boxes, setBoxes] = useState<DetectionBox[]>([]);
+  const pixelFormat = Platform.OS == 'ios' ? 'rgb' : 'yuv';
+  const format = useMemo(
+    () => (device != null ? getBestFormat(device, PHOTO_SRC_WIDTH, PHOTO_SRC_HEIGHT) : undefined),
+    [device],
+  );
+  const cameraSize = scale(
+    SCREEN_WIDTH - 40, 
+    (SCREEN_HEIGHT / 1.5) - 40, 
+    format?.photoWidth,
+    format?.photoHeight,
+  );
+  const styles = styleSheet(cameraSize, CONTENT_SPACING_X, CONTENT_SPACING_Y);
+  useFocusEffect(
+    useCallback(() => {
+      setIsCameraEnabled(true);
+      return () => {
+        setIsCameraEnabled(false);
+      }
+    }, [])
+  );
+  useEffect(() => {
+    if (!hasPermission) {
+      RNCamera.requestCameraPermission();
+    }
+    if (!mediaPermissionResponse?.granted) {
+      mediaRequestPermission();
+    }
+  }, []);
+  useEffect(() => {
+    if (model?.model == null) {
+      return;
+    }
+  }, [model]);
+
+  async function takePhoto() {
+    if (!camera || !camera.current || !isCameraEnabled) return;
+    
+    const photo = await camera.current.takePhoto({ enableShutterSound: false });
+    const oBoxes = await performDetectionFromUri(model?.model as TensorflowModel, photo.path);
+    const s2 = sum(oBoxes);
+
+    setBoxes(oBoxes);
+    setScore(s2);
+    setIsCameraEnabled(false);
+    setIsModalVisible(true);
+  }
+
+  return (
+      <View style={styles.appContainer}>
+
+        <Text style={styles.logo}>Sumjo</Text>
+        {!hasPermission && <Text style={styles.text} onPress={requestPermission}>No Camera Permission.</Text>}
+        {device == null && <Text style={styles.text}>No Camera Found.</Text>}
+        {!mediaPermissionResponse?.granted && <Text style={styles.text} onPress={requestPermission}>No media access Permission.</Text>}
+        
+        {hasPermission && mediaPermissionResponse?.granted && device != null && (
+          <View style={styles.cameraBox}>
+            <View style={styles.overlayTop}></View>
+            <View style={styles.overlayBottom}></View>
+            <RNCamera
+              ref={camera}
+              style={StyleSheet.absoluteFill}
+              device={device}
+              photo={true}
+              isActive={isCameraEnabled}
+              outputOrientation={'preview'}
+              format={format}
+              pixelFormat={pixelFormat}
+              enableZoomGesture={false}
+              onError={(err) => { console.log('RNCamera Error : ', err) }}
+            />
+          </View>
+        )}
+
+        <View style={styles.bottomButtonRow}>
+          <PressableOpacity style={styles.button} onPress={() => takePhoto()}>
+            <Text style={{ color: 'white', fontWeight: '900', fontSize: 46 / 2 }}>{'Get my score !'}</Text>
+          </PressableOpacity>
+        </View>
+
+        <Modal animationType='slide' transparent={true} visible={isModalVisible}>
+          <TouchableOpacity style={styles.modalContainer} onPress={() => {
+            setIsModalVisible(false);
+            setIsCameraEnabled(true);
+          }} activeOpacity={.8}>
+            <TouchableOpacity style={styles.modal}>
+              <View style={styles.modalContent}>
+                <View style={styles.titleContainer}>
+                  <Text style={styles.title}>Your score:</Text>
+                </View>
+                <Text style={styles.result}>{score.toString()}</Text>
+                
+                {boxes.map((box, index) =>
+                  <Text 
+                    key={'detection-' + index} 
+                    style={styles.resultDetail}
+                  >
+                    {box.label}: {Math.round(box.prob * 100)}%
+                  </Text>
+                )}
+              </View>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </Modal>
+      </View>
+    /* </ScrollView> */
+  );
+}
