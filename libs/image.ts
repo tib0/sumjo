@@ -1,22 +1,16 @@
-//import ImageResizer from '@bam.tech/react-native-image-resizer';
 import { Skia } from '@shopify/react-native-skia';
-import { Platform } from 'react-native';
-//import * as MediaLibrary from 'expo-media-library';
 import * as ImageManipulator from 'expo-image-manipulator';
-import { IMAGE_DETECTION_HEIGHT, IMAGE_DETECTION_WIDTH } from '@/constants/Image';
+import { PHOTO_SRC_WIDTH, PHOTO_SRC_HEIGHT } from '@/constants/Image';
 
 export async function resizeImage(uri: string, width: number, height: number) {
-  try {
-    const rotation = Platform.OS == 'android' ? 90 : 0;
-    //const response = await ImageResizer.createResizedImage(uri, width, height, 'JPEG', 100, rotation, undefined, false, { mode: 'stretch' });
-    
+  try {    
     const photo2 = await ImageManipulator.manipulateAsync(uri, 
       [{
         crop: {
-          height: IMAGE_DETECTION_HEIGHT,
-          width: IMAGE_DETECTION_WIDTH,
-          originX: 40,
-          originY: 320,
+          height: width,
+          width: height,
+          originX: (PHOTO_SRC_WIDTH - width) / 2,
+          originY: (PHOTO_SRC_HEIGHT - height) / 2,
         }
       }],
       { compress: 1, format: ImageManipulator.SaveFormat.JPEG });

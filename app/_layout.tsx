@@ -15,9 +15,9 @@ export default function RootLayout() {
   const model = useTensorflowModel(require('@/assets/models/sumjo8su_float32.tflite'));
   const colorScheme = useColorScheme();
   const [fontLoaded] = useFonts({
-    SpaceMono: require('@/assets/fonts/SpaceMono-Regular.ttf'),
+    LemonRegular: require('@/assets/fonts/LemonRegular.ttf')
   });
-
+  
   useEffect(() => {
     if (!fontLoaded) return;
     if (!model) return;

@@ -8,19 +8,19 @@
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#f03"
+      "resizeMode": "cover",
+      "backgroundColor": "#fff"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.sumjo"
+      "supportsTablet": false,
+      "bundleIdentifier": "com.tib0.sumjo"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#fff"
       },
-      "package": "com.anonymous.sumjo"
+      "package": "com.tib0.sumjo"
     },
     "web": {
       "bundler": "metro",
@@ -37,9 +37,10 @@
       ],
       [
         "expo-asset",
-
         {
-          "assets": ["./assets/models/sumjo8su_float32.tflite"]
+          "assets": [
+            "./assets/models/sumjo8su_float32.tflite"
+          ]
         }
       ],
       [
@@ -49,19 +50,19 @@
         }
       ],
       [
-        "expo-media-library",
-        {
-          "photosPermission": "Allow Sumjo app to access your photos.",
-          "savePhotosPermission": "Allow Sumjo app to save photos.",
-          "isAccessMediaLocationEnabled": true
-        }
-      ],
-      [
         "expo-build-properties",
         {
           "android": {
-            "minSdkVersion": 34
+            "minSdkVersion": 33
           }
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/LemonRegular.ttf"
+          ]
         }
       ]
     ],

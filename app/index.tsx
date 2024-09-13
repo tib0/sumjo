@@ -7,6 +7,7 @@ import React, {
   useRef
 } from 'react';
 import {
+  ImageBackground,
   Modal,
   Platform,
   StyleSheet,
@@ -27,21 +28,24 @@ import { performDetectionFromUri } from '@/libs/model';
 import { type TensorflowModel } from 'react-native-fast-tflite';
 import { sum } from '@/libs/sumjo';
 import { PressableOpacity } from 'react-native-pressable-opacity'
-import { CONTENT_SPACING_X, CONTENT_SPACING_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from '@/constants/Screen';
-import { scale } from '@/libs/pixel';
+import { CONTENT_SPACING_X, CONTENT_SPACING_Y, BOTTOM_SPEC, SCREEN_HEIGHT, SCREEN_WIDTH } from '@/constants/Screen';
 import { DetectionBox } from '@/types/Sumjo';
-import * as MediaLibrary from 'expo-media-library';
 import { PHOTO_SRC_HEIGHT, PHOTO_SRC_WIDTH } from '@/constants/Image';
+import { StrokeText } from "@charmy.tech/react-native-stroke-text";
 
-const styleSheet = (cameraSize: { width: number, height: number }, paddingX: number, paddingY: number) => StyleSheet.create({
+const styleSheet = (cameraSize: { width: number, height: number }, padding: {x: number, y: number, bottomSpec: number}) => StyleSheet.create({
   appContainer: {
     display: 'flex',
     justifyContent: 'space-between',
-    paddingHorizontal: paddingX,
-    paddingTop: paddingY,
+    paddingHorizontal: padding.x,
+    paddingTop: padding.y / 1.25,
     minHeight: '100%',
-    paddingBottom: paddingY / 4,
+    paddingBottom: padding.y / 4 + padding.bottomSpec,
     backgroundColor: 'lightgreen'
+  },
+  image: {
+    flex: 1,
+    justifyContent: 'center',
   },
   overlayTop: {
     position: 'absolute',
@@ -64,18 +68,14 @@ const styleSheet = (cameraSize: { width: number, height: number }, paddingX: num
     opacity: .6
   },
   logo: {
-    color: 'black',
-    fontSize: paddingY * 1.5,
-    lineHeight: paddingY * 1.5,
-    paddingBottom: paddingY / 2,
-    fontWeight: '900',
-    textAlign: 'center',
+    alignItems: 'center',
+    paddingBottom: padding.y / 3,
   },
   cameraBox: {
     flex: 4,
     width: cameraSize.width,
     height: cameraSize.height,
-    borderRadius: paddingY / 3,
+    borderRadius: padding.y / 3,
     backgroundColor: 'black',
     overflow: 'hidden',
   },
@@ -83,15 +83,20 @@ const styleSheet = (cameraSize: { width: number, height: number }, paddingX: num
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
-    paddingBottom: paddingY / 4,
+    paddingBottom: padding.y / 4,
   },
   button: {
     width: '100%',
-    height: paddingY * 1.75,
-    borderRadius: paddingY / 3,
+    height: padding.y * 1.75,
+    borderRadius: padding.y / 3,
     backgroundColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  buttonText: { 
+    color: 'white', 
+    fontSize: 46 / 1.75,
+    fontFamily: 'LemonRegular'
   },
   modalContainer: {
     flex: 1,
@@ -140,7 +145,6 @@ const styleSheet = (cameraSize: { width: number, height: number }, paddingX: num
   },
 });
 
-
 function getBestFormat(
   device: CameraDevice,
   targetWidth: number,
@@ -162,7 +166,6 @@ function getBestFormat(
 
 export default function Index(): JSX.Element {
   const { hasPermission, requestPermission } = useCameraPermission();
-  const [mediaPermissionResponse, mediaRequestPermission] = MediaLibrary.usePermissions();
   const [isCameraEnabled, setIsCameraEnabled] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const position = 'back';
@@ -178,13 +181,11 @@ export default function Index(): JSX.Element {
     () => (device != null ? getBestFormat(device, PHOTO_SRC_WIDTH, PHOTO_SRC_HEIGHT) : undefined),
     [device],
   );
-  const cameraSize = scale(
-    SCREEN_WIDTH - 40, 
-    (SCREEN_HEIGHT / 1.5) - 40, 
-    format?.photoWidth,
-    format?.photoHeight,
-  );
-  const styles = styleSheet(cameraSize, CONTENT_SPACING_X, CONTENT_SPACING_Y);
+  const cameraSize = {
+    width: SCREEN_WIDTH - 40, 
+    height: (SCREEN_HEIGHT / 1.5) - 40
+  };
+  const styles = styleSheet(cameraSize, {x: CONTENT_SPACING_X, y: CONTENT_SPACING_Y, bottomSpec: BOTTOM_SPEC});
   useFocusEffect(
     useCallback(() => {
       setIsCameraEnabled(true);
@@ -196,9 +197,6 @@ export default function Index(): JSX.Element {
   useEffect(() => {
     if (!hasPermission) {
       RNCamera.requestCameraPermission();
-    }
-    if (!mediaPermissionResponse?.granted) {
-      mediaRequestPermission();
     }
   }, []);
   useEffect(() => {
@@ -223,61 +221,70 @@ export default function Index(): JSX.Element {
   return (
       <View style={styles.appContainer}>
 
-        <Text style={styles.logo}>Sumjo</Text>
-        {!hasPermission && <Text style={styles.text} onPress={requestPermission}>No Camera Permission.</Text>}
-        {device == null && <Text style={styles.text}>No Camera Found.</Text>}
-        {!mediaPermissionResponse?.granted && <Text style={styles.text} onPress={requestPermission}>No media access Permission.</Text>}
-        
-        {hasPermission && mediaPermissionResponse?.granted && device != null && (
-          <View style={styles.cameraBox}>
-            <View style={styles.overlayTop}></View>
-            <View style={styles.overlayBottom}></View>
-            <RNCamera
-              ref={camera}
-              style={StyleSheet.absoluteFill}
-              device={device}
-              photo={true}
-              isActive={isCameraEnabled}
-              outputOrientation={'preview'}
-              format={format}
-              pixelFormat={pixelFormat}
-              enableZoomGesture={false}
-              onError={(err) => { console.log('RNCamera Error : ', err) }}
+        <ImageBackground resizeMethod='resize' source={require('@/assets/images/bg.webp')} resizeMode="cover" style={StyleSheet.absoluteFill}>
+        </ImageBackground>
+          <View style={styles.logo}>
+            <StrokeText
+              text='SumjO'
+              fontSize={CONTENT_SPACING_Y * 1.5}
+              color='#ffffff'
+              strokeColor='#000000'
+              strokeWidth={CONTENT_SPACING_Y / 2}
+              fontFamily='LemonRegular'
             />
           </View>
-        )}
+          {!hasPermission && <Text style={styles.text} onPress={requestPermission}>No Camera Permission.</Text>}
+          {device == null && <Text style={styles.text}>No Camera Found.</Text>}
+          
+          {hasPermission && device != null && (
+            <View style={styles.cameraBox}>
+              <View style={styles.overlayTop}></View>
+              <View style={styles.overlayBottom}></View>
+              <RNCamera
+                ref={camera}
+                style={StyleSheet.absoluteFill}
+                device={device}
+                photo={true}
+                isActive={isCameraEnabled}
+                outputOrientation={'preview'}
+                format={format}
+                pixelFormat={pixelFormat}
+                enableZoomGesture={false}
+                onError={(err) => { console.log('RNCamera Error : ', err) }}
+              />
+            </View>
+          )}
 
-        <View style={styles.bottomButtonRow}>
-          <PressableOpacity style={styles.button} onPress={() => takePhoto()}>
-            <Text style={{ color: 'white', fontWeight: '900', fontSize: 46 / 2 }}>{'Get my score !'}</Text>
-          </PressableOpacity>
-        </View>
+          <View style={styles.bottomButtonRow}>
+            <PressableOpacity style={styles.button} onPress={() => takePhoto()}>
+              <Text style={styles.buttonText}>{'Get my score!'}</Text>
+            </PressableOpacity>
+          </View>
 
-        <Modal animationType='slide' transparent={true} visible={isModalVisible}>
-          <TouchableOpacity style={styles.modalContainer} onPress={() => {
-            setIsModalVisible(false);
-            setIsCameraEnabled(true);
-          }} activeOpacity={.8}>
-            <TouchableOpacity style={styles.modal}>
-              <View style={styles.modalContent}>
-                <View style={styles.titleContainer}>
-                  <Text style={styles.title}>Your score:</Text>
+          <Modal animationType='slide' transparent={true} visible={isModalVisible}>
+            <TouchableOpacity style={styles.modalContainer} onPress={() => {
+              setIsModalVisible(false);
+              setIsCameraEnabled(true);
+            }} activeOpacity={.8}>
+              <TouchableOpacity style={styles.modal}>
+                <View style={styles.modalContent}>
+                  <View style={styles.titleContainer}>
+                    <Text style={styles.title}>Your score:</Text>
+                  </View>
+                  <Text style={styles.result}>{score.toString()}</Text>
+                  
+                  {boxes.map((box, index) =>
+                    <Text 
+                      key={'detection-' + index.toString()} 
+                      style={styles.resultDetail}
+                    >
+                      {box.label}: {Math.round(box.prob * 100)}%
+                    </Text>
+                  )}
                 </View>
-                <Text style={styles.result}>{score.toString()}</Text>
-                
-                {boxes.map((box, index) =>
-                  <Text 
-                    key={'detection-' + index} 
-                    style={styles.resultDetail}
-                  >
-                    {box.label}: {Math.round(box.prob * 100)}%
-                  </Text>
-                )}
-              </View>
+              </TouchableOpacity>
             </TouchableOpacity>
-          </TouchableOpacity>
-        </Modal>
+          </Modal>
       </View>
-    /* </ScrollView> */
   );
 }

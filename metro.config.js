@@ -15,5 +15,4 @@ config.transformer = {
 
 config.resolver.assetExts.push("tflite");
 
-
 module.exports = config;
