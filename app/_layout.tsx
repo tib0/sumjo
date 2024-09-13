@@ -1,11 +1,8 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
 import { useTensorflowModel } from 'react-native-fast-tflite';
 import { SumjoModelContext } from '@/context/SumjoModelContext';
 
@@ -13,7 +10,6 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const model = useTensorflowModel(require('@/assets/models/sumjo8su_float32.tflite'));
-  const colorScheme = useColorScheme();
   const [fontLoaded] = useFonts({
     LemonRegular: require('@/assets/fonts/LemonRegular.ttf')
   });
@@ -30,7 +26,7 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={DefaultTheme}>
       <SumjoModelContext.Provider value={model}>
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
