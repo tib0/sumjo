@@ -1,15 +1,25 @@
 import { StyleSheet } from "react-native";
-import { CONTENT_SPACING_X, CONTENT_SPACING_Y, BOTTOM_SPEC } from '@/constants/Screen';
+import { SCREEN_WIDTH, SCREEN_HEIGHT, CONTENT_SPACING_X, CONTENT_SPACING_Y, BOTTOM_SPEC } from '@/constants/Screen';
 
-export const styleSheet = (cameraSize: { width: number, height: number }) => StyleSheet.create({
+const cameraSize = {
+  width: SCREEN_WIDTH - (CONTENT_SPACING_X * 2),
+  height: (SCREEN_HEIGHT / 1.5) - (CONTENT_SPACING_Y * 2)
+};
+
+export const styleSheet = () => StyleSheet.create({
   appContainer: {
     display: 'flex',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: CONTENT_SPACING_X,
     paddingTop: CONTENT_SPACING_Y / 1.25,
     minHeight: '100%',
     paddingBottom: CONTENT_SPACING_Y / 4 + BOTTOM_SPEC,
     backgroundColor: 'lightgreen'
+  },
+  text: {
+    color: 'white',
+    fontSize: 20,
   },
   image: {
     flex: 1,
@@ -35,26 +45,38 @@ export const styleSheet = (cameraSize: { width: number, height: number }) => Sty
     backgroundColor: 'black',
     opacity: .6
   },
+  overlayBorder: {
+    position: 'absolute',
+    top: '0%',
+    height: '100%',
+    width: '100%',
+    alignSelf: 'center',
+    zIndex: 1,
+    backgroundColor: 'transparent',
+    borderWidth: CONTENT_SPACING_Y / 4.5,
+    borderRadius: CONTENT_SPACING_Y / 3,
+    borderColor: 'black',
+  },
   logo: {
     alignItems: 'center',
     paddingBottom: CONTENT_SPACING_Y / 3,
   },
   cameraBox: {
     flex: 4,
-    width: cameraSize.width,
-    height: cameraSize.height,
+    width: cameraSize?.width,
+    height: cameraSize?.height,
     borderRadius: CONTENT_SPACING_Y / 3,
     backgroundColor: 'black',
     overflow: 'hidden',
   },
   bottomButtonRow: {
     flex: 1,
+    width: '100%',
     flexDirection: 'column',
     justifyContent: 'center',
     paddingBottom: CONTENT_SPACING_Y / 4,
   },
   button: {
-    width: '100%',
     height: CONTENT_SPACING_Y * 1.75,
     borderRadius: CONTENT_SPACING_Y / 3,
     backgroundColor: 'black',
@@ -63,52 +85,28 @@ export const styleSheet = (cameraSize: { width: number, height: number }) => Sty
   },
   buttonText: { 
     color: 'white', 
-    fontSize: 46 / 1.75,
+    fontSize: CONTENT_SPACING_Y / 1.5,
     fontFamily: 'LemonRegular'
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
-  text: {
-    color: 'white',
-    fontSize: 20,
-  },
-  modalContent: {
-    height: 350,
-    width: '100%',
-    backgroundColor: '#25292e',
-    borderTopLeftRadius: 18,
-    borderTopRightRadius: 18,
-    position: 'absolute',
-    bottom: 0,
-  },
-  titleContainer: {
-    height: 32,
-    backgroundColor: '#464C55',
-    borderTopRightRadius: 10,
-    borderTopLeftRadius: 10,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
+
+  modal: {
+    borderRadius: 12,
+    overflow: 'hidden',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    padding: CONTENT_SPACING_X / 2,
+    maxWidth: SCREEN_WIDTH - (CONTENT_SPACING_X * 2),
+    maxHeight: SCREEN_HEIGHT - (CONTENT_SPACING_Y * 2),
   },
   title: {
     color: '#fff',
-    fontSize: 18,
-  },
-  modal: {
-    width: '100%',
-    height: 350
-  },
-  result: {
-    color: '#fff',
-    fontSize: 36,
-  },
-  resultDetail: {
-    color: '#fff',
-    fontSize: 18,
+    fontSize: 22,
+    fontFamily: 'LemonRegular'
   },
 });

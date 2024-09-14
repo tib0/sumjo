@@ -30,6 +30,7 @@ export default function RootLayout() {
       <SumjoModelContext.Provider value={model}>
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="about" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
       </SumjoModelContext.Provider>
