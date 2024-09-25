@@ -2,12 +2,16 @@ import { CONTENT_SPACING_Y } from '@/constants/Screen';
 import { styleSheet } from '@/libs/styles';
 import { StrokeText } from '@charmy.tech/react-native-stroke-text';
 import { View } from 'react-native';
+import * as Linking from 'expo-linking';
 
 export function Logo() {
   const styles = styleSheet();
 
   return (
-    <View style={styles.logo}>
+    <View
+      style={styles.logo}
+      onTouchEnd={() => Linking.openURL('https://folio.tib0.com')}
+    >
       <StrokeText
         text='SumjO'
         fontSize={CONTENT_SPACING_Y * 1.5}
