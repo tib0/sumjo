@@ -1,56 +1,48 @@
-# Welcome to your Expo app 👋
+# SUMJO
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Sumjo is an image recognition application that let you get your results on Skyjo end game board.
 
-## Get started
+SKYJO (by Magilano) is an entertaining card game for 7-99. The ideal game for fun, entertaining and exciting want you to trade and collects card in a minimum amount.
 
-1. Install dependencies
+- [💻 Install](#install)
+- [📸 Screenshots](#screenshots)
+- [❔️ How it Works](#how-it-works)
+- [⬇️ Use from sources](#use-from-sources)
+- [👨‍💼 Dependencies](#dependencies)
+- [📜 License](#license)
 
-   ```bash
-   npm install
-   ```
+## Install
 
-2. Start the app
+The application can be installed via the Google Play Store or Mac App Store on mobile device.
 
-   ```bash
-    npx expo start
-   ```
+## Screenshots
 
-In the output, you'll find options to open the app in a
+## How it works
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### App usage
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+At the end of a Skyjo game run the app take a picture of your board state by touching the button, then the result will appear on the screen.
 
-## Get a fresh project
+### Internally
 
-When you're ready, run:
+I used models and training data sample available here https://universe.roboflow.com/elmurd0r/skyjo to train a TFLite model with Yolo https://github.com/ultralytics/yolov5. I used Expo (https://expo.dev/) to power the app with code written in React Native. The model itself run with https://github.com/mrousavy/react-native-fast-tflite wich rely on TensorFlow Lite. To handle camera I use https://github.com/mrousavy/react-native-vision-camera. The picture is then cropped using Skia https://github.com/shopify/react-native-skia.
 
-```bash
-npm run reset-project
+## Use from sources
+
+Clone this project, install dependencies and then from the project folder run :
+
+For iOS
+
+```
+npx expo run:android --variant release
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+For Android
 
-## Learn more
+```
+npx expo run:ios --configuration Release --device
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## Dependencies
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-
-### TODOS
-
-- [] Add about modal
-- [] Update readme
-- [] Make public
+## License
