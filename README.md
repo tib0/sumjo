@@ -1,5 +1,6 @@
-# SUMJO
-
+<p align="center">
+  <img src="assets/images/icon.png" style="max-width: 400px" />
+</p>
 Sumjo is an image recognition application that let you get your results on Skyjo end game board.
 
 SKYJO (by Magilano) is an entertaining card game for 7-99. The ideal game for fun, entertaining and exciting want you to trade and collects card in a minimum amount.
