@@ -57,7 +57,7 @@ export default function Index(): JSX.Element {
     if (!camera || !camera.current || !isCameraEnabled) return;
     const photo = await camera.current.takePhoto({ enableShutterSound: false });
     const oBoxes = await performDetectionFromUri(
-      model?.model as TensorflowModel, 
+      model?.model as TensorflowModel,
       photo.path
     );
     setScore(sum(oBoxes));
@@ -67,26 +67,27 @@ export default function Index(): JSX.Element {
 
   return (
     <View style={styles.appContainer}>
-      <ImageBackground 
-        resizeMethod='resize' 
-        source={require('@/assets/images/bg.webp')} 
-        resizeMode='cover' 
-        style={StyleSheet.absoluteFill} 
+      <ImageBackground
+        resizeMethod='resize'
+        source={require('@/assets/images/bg.webp')}
+        resizeMode='cover'
+        style={StyleSheet.absoluteFill}
       />
 
       <Logo />
 
-      <Camera isCameraEnabled={isCameraEnabled} ref={camera}/>
+      <Camera isCameraEnabled={isCameraEnabled} ref={camera} />
 
       <View style={styles.bottomButtonRow}>
         <Button onPress={() => takePhoto()} text={'Get my score!'} />
       </View>
-      <ResultModal 
+
+      <ResultModal
         isModalVisible={isModalVisible}
         onPress={() => {
           setIsModalVisible(false);
           setIsCameraEnabled(true);
-        }} 
+        }}
         score={score.toString()}
       />
     </View>
