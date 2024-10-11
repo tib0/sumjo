@@ -28,14 +28,14 @@ export async function performDetectionFromUri(model: TensorflowModel, uri: strin
   return performDetectionFromArray(model, arrayBuffer);
 }
 
-export function performDetectionFromArray(model: TensorflowModel, arrayBuffer: Float32Array): DetectionBox[] { 
+export function performDetectionFromArray(model: TensorflowModel, arrayBuffer: Float32Array): DetectionBox[] {
   'worklet'
   const result = model?.runSync([arrayBuffer]);
   if (!result || result.length < 1) return [];
   const outputTensor = result[0];
   const numDetections = 8400;
   let boxes: DetectionBox[] = [];
-   for (let index = 0; index < numDetections; index++) {
+  for (let index = 0; index < numDetections; index++) {
     const [class_id, prob] =
       [...Array(15).keys()].map((col) => {
         return [col, outputTensor[numDetections * (col + 4) + index]]
@@ -78,12 +78,7 @@ export function performDetectionFromArray(model: TensorflowModel, arrayBuffer: F
   let output = [];
   while (boxes.length > 0) {
     output.push(boxes[0]);
-    /* boxes = boxes.map((box: DetectionBox) => {
-      if (iou(boxes[0].xCoordinate, box.xCoordinate) < 0.7 && boxes[0].label == box.label) {
-        boxes[0].prob = (boxes[0].prob + box.prob / 2);
-      }
-      return box;
-    }) */
+
     boxes = boxes.filter((box: DetectionBox) => {
       return iou(boxes[0].xCoordinate, box.xCoordinate) < 0.7;
     });
