@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/images/icon.png" style="max-width: 200px" />
+  <img src="assets/images/icon.png" width="120px" />
 </p>
 
 **Sumjo** is an image recognition application that let you get your results on Skyjo (c) end game board.
@@ -9,6 +9,7 @@ In this captivating game, the aim is to keep point aggregation to a bare minimum
 
 - [💻 Install](#install)
 - [📸 Screenshots](#screenshots)
+- [🎥 Demo](#demo)
 - [❔️ How it Works](#how-it-works)
 - [⬇️ Use from sources](#use-from-sources)
 - [📜 License](#license)
@@ -20,24 +21,24 @@ In this captivating game, the aim is to keep point aggregation to a bare minimum
 ## Screenshots
 
 <p align="center">
-  <img src="assets/images/screenshots/SUMJO_icon.webp" style="max-width: 120px" />
+  <img src="assets/images/screenshots/SUMJO_icon.webp" width="60px" />
 </p>
 
 <p align="center">
-  <img src="assets/images/screenshots/SUMJO_splash.webp" style="max-width: 320px" />
+  <img src="assets/images/screenshots/SUMJO_inapp_1.webp" width="120px" />
 </p>
 
 <p align="center">
-  <img src="assets/images/screenshots/SUMJO_inapp_1.webp" style="max-width: 320px" />
+  <img src="assets/images/screenshots/SUMJO_inapp_2.webp" width="120px" />
 </p>
 
-<p align="center">
-  <img src="assets/images/screenshots/SUMJO_inapp_2.webp" style="max-width: 320px" />
-</p>
+## Demo
 
-<p align="center">
-  <video src="assets/images/screenshots/SumjoDemoFinalEditedCrop.mp4" width="320px" />
-</p>
+<div align="center">
+  <a href="https://www.youtube.com/watch?v=WRWxTETLeCU">
+    <img src="assets/images/screenshots/SUMJO_splash.webp" width="120px">
+  </a>
+</div>
 
 ## How it works
 
