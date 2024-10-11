@@ -13,7 +13,7 @@ export default function RootLayout() {
   const [fontLoaded] = useFonts({
     LemonRegular: require('@/assets/fonts/LemonRegular.ttf')
   });
-  
+
   useEffect(() => {
     if (!fontLoaded) return;
     if (!model) return;
@@ -30,7 +30,6 @@ export default function RootLayout() {
       <SumjoModelContext.Provider value={model}>
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="about" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
         </Stack>
       </SumjoModelContext.Provider>
