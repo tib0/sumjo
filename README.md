@@ -18,7 +18,7 @@ SKYJO, a card game developed by Magilano and suitable for players aged 7 to 99, 
 
 ## Install
 
-~~The application can be installed via the Google Play Store or Mac App Store on mobile device.~~ --> Soon (maybe), for now you have to build it yourself... see [⬇️ Use from sources](#use-from-sources)
+~~The application can be installed via the Google Play Store or Mac App Store on mobile device.~~ --> Soon, for now you have to build it yourself, see [⬇️ Use from sources](#use-from-sources) or [releases page](https://github.com/tib0/sumjo/releases) install APK according to the following [how to](https://www.wikihow.com/Install-APK-Files-on-Android)
 
 ## Screenshots
 
@@ -51,6 +51,18 @@ At the end of a Skyjo game run the app take a picture of your board state by tou
 ### Internally
 
 I used models and training data samples available here https://universe.roboflow.com/elmurd0r/skyjo to train a TFLite model with Yolo https://github.com/ultralytics/yolov5. I used Expo (https://expo.dev/) to power the app with code written in React Native. The model itself runs with https://github.com/mrousavy/react-native-fast-tflite which relies on TensorFlow Lite library and exposes it to my react components. To handle camera, I use https://github.com/mrousavy/react-native-vision-camera. The picture is then cropped and resized using Skia https://github.com/shopify/react-native-skia.
+
+### Device compatibility
+
+- Needs camera
+- iOS / Android
+
+| Ref                 | Version       | Year |
+| ------------------- | ------------- | ---- |
+| Expo SDK            | 51            | 2024 |
+| Android (OS)        | 13 (Tiramisu) | 2022 |
+| Android (API level) | 33            | 2022 |
+| iOS (OS)            | 13            | 2019 |
 
 ## Use from sources
 
