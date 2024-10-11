@@ -1,11 +1,10 @@
 <p align="center">
-  <img src="assets/images/icon.png" width="120px" />
+  <img src="assets/images/icon.png" width="300px" />
 </p>
 
-**Sumjo** is an image recognition application that let you get your results on Skyjo (c) end game board.
+**Sumjo** is an image recognition application that uses AI to calculate the outcome of a SKYJO (c) game by analyzing a photo taken at the end of the game.
 
-SKYJO (Copyright by Magilano) is an entertaining card game for 7-99.
-In this captivating game, the aim is to keep point aggregation to a bare minimum across multiple rounds. At the conclusion of each round, the scores are meticulously recorded and aggregated into each player's overall sum. The instant any player surpasses 100 points or more, the game terminates, and the player who has managed to retain the fewest points shall be proclaimed the triumphant victor.
+SKYJO, a card game developed by Magilano and suitable for players aged 7 to 99, is an engaging and entertaining experience. The goal is to maintain the lowest score possible across multiple rounds. Scores are carefully tracked and summed up after each round, with the game ending when any player exceeds 100 points. The player with the lowest total score at this point is declared the winner.
 
 - [💻 Install](#install)
 - [📸 Screenshots](#screenshots)
@@ -21,22 +20,22 @@ In this captivating game, the aim is to keep point aggregation to a bare minimum
 ## Screenshots
 
 <p align="center">
-  <img src="assets/images/screenshots/SUMJO_icon.webp" width="60px" />
+  <img src="assets/images/screenshots/SUMJO_icon.webp" width="120px" />
 </p>
 
 <p align="center">
-  <img src="assets/images/screenshots/SUMJO_inapp_1.webp" width="120px" />
+  <img src="assets/images/screenshots/SUMJO_inapp_1.webp" width="240px" />
 </p>
 
 <p align="center">
-  <img src="assets/images/screenshots/SUMJO_inapp_2.webp" width="120px" />
+  <img src="assets/images/screenshots/SUMJO_inapp_2.webp" width="240px" />
 </p>
 
 ## Demo
 
 <div align="center">
   <a href="https://www.youtube.com/watch?v=WRWxTETLeCU">
-    <img src="assets/images/screenshots/SUMJO_splash.webp" width="120px">
+    <img src="assets/images/screenshots/SUMJO_splash.webp" width="240px">
   </a>
 </div>
 
@@ -48,7 +47,7 @@ At the end of a Skyjo game run the app take a picture of your board state by tou
 
 ### Internally
 
-I used models and training data sample available here https://universe.roboflow.com/elmurd0r/skyjo to train a TFLite model with Yolo https://github.com/ultralytics/yolov5. I used Expo (https://expo.dev/) to power the app with code written in React Native. The model itself run with https://github.com/mrousavy/react-native-fast-tflite wich rely on TensorFlow Lite library and expose it to my react components. To handle camera I use https://github.com/mrousavy/react-native-vision-camera. The picture is then cropped and resized using Skia https://github.com/shopify/react-native-skia.
+I used models and training data samples available here https://universe.roboflow.com/elmurd0r/skyjo to train a TFLite model with Yolo https://github.com/ultralytics/yolov5. I used Expo (https://expo.dev/) to power the app with code written in React Native. The model itself runs with https://github.com/mrousavy/react-native-fast-tflite which relies on TensorFlow Lite library and exposes it to my react components. To handle camera, I use https://github.com/mrousavy/react-native-vision-camera. The picture is then cropped and resized using Skia https://github.com/shopify/react-native-skia.
 
 ## Use from sources
 
