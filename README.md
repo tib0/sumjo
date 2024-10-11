@@ -1,5 +1,6 @@
 <p align="center">
   <img src="assets/images/icon.png" width="300px" />
+  v1.0.0
 </p>
 
 **Sumjo** is an image recognition application that uses AI to calculate the outcome of a SKYJO (c) game by analyzing a photo taken at the end of the game.
