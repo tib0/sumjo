@@ -3,6 +3,7 @@
     "name": "Sumjo",
     "description": "Sumjo is an image recognition application that uses AI to calculate the outcome of a SKYJO (c) game by analyzing a photo taken at the end of the game.",
     "slug": "sumjo",
+    "scheme": "sumjoapp",
     "version": "1.0.0",
     "owner": "Tib0",
     "orientation": "portrait",
@@ -62,6 +63,9 @@
         {
           "android": {
             "minSdkVersion": 33
+          },
+          "ios": {
+            "deploymentTarget": "13.4"
           }
         }
       ],
