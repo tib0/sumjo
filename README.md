@@ -18,7 +18,11 @@ SKYJO, a card game developed by Magilano and suitable for players aged 7 to 99, 
 
 ## Install
 
-~~The application can be installed via the Google Play Store or Mac App Store on mobile device.~~ --> Soon, for now you have to build it yourself, see [⬇️ Use from sources](#use-from-sources) or [releases page](https://github.com/tib0/sumjo/releases) install APK according to the following [how to](https://www.wikihow.com/Install-APK-Files-on-Android)
+~~The application can be installed via the Google Play Store or Mac App Store on mobile device.~~ --> **Soon**
+
+Please note that it is currently in beta testing phase and not publicly available. To request an invitation to try out Sumjo, send me a message. I will add you to the preview list, allowing you to find Sumjo in Google Play store.
+
+Alternatively you can build the app yourself, see [⬇️ Use from sources](#use-from-sources) or [releases page](https://github.com/tib0/sumjo/releases) install APK according to the following [how to](https://www.wikihow.com/Install-APK-Files-on-Android).
 
 ## Screenshots
 
@@ -46,7 +50,7 @@ SKYJO, a card game developed by Magilano and suitable for players aged 7 to 99, 
 
 ### App usage
 
-At the end of a Skyjo game run the app take a picture of your board state by touching the button, then the result will appear on the screen.
+At the end of a Skyjo game run the app and take a picture of your board state by touching the button, then the result will appear on the screen.
 
 ### Internally
 
