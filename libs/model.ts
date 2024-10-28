@@ -1,7 +1,7 @@
 import { type Tensor, type TensorflowModel } from "react-native-fast-tflite";
 import { getRGBArrayFromUri, resizeImage } from "./image";
 import { iou } from "./pixel";
-import { SUMJO_CLASSES, SUMJO_TRESHOLD } from "@/constants/Sumjo";
+import { SUMJO_CLASSES, SUMJO_PROB_TRESHOLD, SUMJO_IOU_TRESHOLD, SUMJO_DETECTIONS } from "@/constants/Sumjo";
 import { DetectionBox } from "@/types/Sumjo";
 import { IMAGE_DETECTION_HEIGHT, IMAGE_DETECTION_WIDTH } from "@/constants/Image";
 
@@ -33,17 +33,17 @@ export function performDetectionFromArray(model: TensorflowModel, arrayBuffer: F
   const result = model?.runSync([arrayBuffer]);
   if (!result || result.length < 1) return [];
   const outputTensor = result[0];
-  const numDetections = 8400;
+  const numDetections = SUMJO_DETECTIONS;
   let boxes: DetectionBox[] = [];
   for (let index = 0; index < numDetections; index++) {
     const [class_id, prob] =
-      [...Array(15).keys()].map((col) => {
+      [...Array(SUMJO_CLASSES.length).keys()].map((col) => {
         return [col, outputTensor[numDetections * (col + 4) + index]]
       }).reduce((accum, item) =>
         item[1] > accum[1] ? item : accum
       );
 
-    if (prob < SUMJO_TRESHOLD) {
+    if (prob < SUMJO_PROB_TRESHOLD) {
       continue;
     }
 
@@ -80,7 +80,7 @@ export function performDetectionFromArray(model: TensorflowModel, arrayBuffer: F
     output.push(boxes[0]);
 
     boxes = boxes.filter((box: DetectionBox) => {
-      return iou(boxes[0].xCoordinate, box.xCoordinate) < 0.7;
+      return iou(boxes[0].xCoordinate, box.xCoordinate) < SUMJO_IOU_TRESHOLD || boxes[0].label != box.label;
     });
   }
 
