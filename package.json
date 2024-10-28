@@ -5,7 +5,7 @@
     "name": "Tib0",
     "url": "https://folio.tib0.com"
   },
-  "version": "1.0.1",
+  "version": "1.0.2",
   "scripts": {
     "start": "watchman watch-del-all ; expo start",
     "reset-project": "node ./scripts/reset-project.js",
