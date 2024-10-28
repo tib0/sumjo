@@ -20,7 +20,7 @@ import { performDetectionFromUri } from '@/libs/model';
 import { type TensorflowModel } from 'react-native-fast-tflite';
 import { sum } from '@/libs/sumjo';
 import { styleSheet } from '@/libs/styles';
-import { Camera } from '@/components/camera';
+import Camera from '@/components/camera';
 import { Button } from '@/components/button';
 import { ResultModal } from '@/components/resultModal';
 import { Logo } from '@/components/logo';

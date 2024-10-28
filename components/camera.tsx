@@ -1,8 +1,8 @@
-import React, { forwardRef, RefObject, useEffect, useMemo } from 'react';
-import { CONTENT_SPACING_Y } from '@/constants/Screen';
+import React, { useEffect, useMemo } from 'react';
+import { CONTENT_SPACING_Y, PIXEL_FORMAT } from '@/constants/Screen';
 import { styleSheet } from '@/libs/styles';
 import { StrokeText } from '@charmy.tech/react-native-stroke-text';
-import { Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import {
   Camera as RNCamera,
   useCameraDevice,
@@ -15,7 +15,7 @@ type ICamera = {
   isCameraEnabled?: boolean;
 };
 
-export const Camera = React.forwardRef<RNCamera, ICamera>((
+const Camera = React.forwardRef<RNCamera, ICamera>((
   { isCameraEnabled }: ICamera, ref: React.Ref<RNCamera>
 ) => {
   const { hasPermission, requestPermission } = useCameraPermission();
@@ -26,7 +26,7 @@ export const Camera = React.forwardRef<RNCamera, ICamera>((
   }, []);
   const styles = styleSheet();
   const position = 'back';
-  const pixelFormat = Platform.OS == 'ios' ? 'rgb' : 'yuv';
+  const pixelFormat = PIXEL_FORMAT;
   const device = useCameraDevice(position, {
     physicalDevices: ['wide-angle-camera'],
   });
@@ -83,3 +83,7 @@ export const Camera = React.forwardRef<RNCamera, ICamera>((
     </>
   );
 });
+
+Camera.displayName = 'Camera';
+
+export default Camera;
