@@ -5,7 +5,8 @@
     "slug": "sumjo",
     "scheme": "sumjoapp",
     "version": "1.0.1",
-    "owner": "Tib0",
+    "channel": "main",
+    "owner": "tib0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "githubUrl": "https://github.com/tib0/sumjo",
@@ -31,6 +32,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#fff"
       },
+      "versionCode": 2,
       "package": "com.tib0.sumjo",
       "permissions": [
         "android.permission.CAMERA"
@@ -88,6 +90,12 @@
       "eas": {
         "projectId": "09648c5a-7790-4a7f-a8ac-f62aa336b80a"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/09648c5a-7790-4a7f-a8ac-f62aa336b80a"
     }
   }
 }
