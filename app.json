@@ -5,7 +5,6 @@
     "slug": "sumjo",
     "scheme": "sumjoapp",
     "version": "1.0.2",
-    "channel": "main",
     "owner": "tib0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
