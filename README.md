@@ -1,7 +1,7 @@
 <p align="center">
   <img src="assets/images/icon.png" width="300px" />
   <p align="center" style="font-weight: 800;">
-    v1.0.2
+    v1.0.3
   </p>
 </p>
 
