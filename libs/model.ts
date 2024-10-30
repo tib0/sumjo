@@ -75,9 +75,10 @@ export function performDetectionFromArray(model: TensorflowModel, arrayBuffer: F
   let output = [];
   while (boxes.length > 0) {
     output.push(boxes[0]);
-
     boxes = boxes.filter((box: DetectionBox) => {
-      return iou(boxes[0].coordinates, box.coordinates) < SUMJO_IOU_TRESHOLD || boxes[0].label !== box.label;
+      if (boxes[0].label !== box.label) return true;
+      const boxIoU = iou(boxes[0].coordinates, box.coordinates);
+      return boxIoU < SUMJO_IOU_TRESHOLD || boxIoU > 1;
     });
   }
 
