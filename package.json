@@ -8,7 +8,7 @@
   "version": "1.0.4",
   "scripts": {
     "start": "watchman watch-del-all ; expo start",
-    "reset-project": "node ./scripts/reset-project.js",
+    "build": "expo prebuild ; cd ios ; pod install ; cd ..",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "test": "jest --watchAll",
