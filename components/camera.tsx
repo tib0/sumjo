@@ -30,6 +30,7 @@ const Camera = React.forwardRef<RNCamera, ICamera>((
   const device = useCameraDevice(position, {
     physicalDevices: ['wide-angle-camera'],
   });
+
   const format = useMemo(
     () => (device != null ?
       getBestFormat(device, PHOTO_SRC_WIDTH, PHOTO_SRC_HEIGHT) :
@@ -75,6 +76,7 @@ const Camera = React.forwardRef<RNCamera, ICamera>((
             outputOrientation={'preview'}
             format={format}
             pixelFormat={pixelFormat}
+            exposure={1}
             enableZoomGesture={false}
             onError={(err) => { console.log('RNCamera Error : ', err) }}
           />
