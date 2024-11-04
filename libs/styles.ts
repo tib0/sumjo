@@ -33,7 +33,7 @@ export const styleSheet = () => StyleSheet.create({
     alignSelf: 'center',
     zIndex: 1,
     backgroundColor: 'black',
-    opacity: .6
+    opacity: .7
   },
   overlayBottom: {
     position: 'absolute',
@@ -43,7 +43,7 @@ export const styleSheet = () => StyleSheet.create({
     alignSelf: 'center',
     zIndex: 1,
     backgroundColor: 'black',
-    opacity: .6
+    opacity: .7
   },
   overlayBorder: {
     position: 'absolute',
@@ -83,8 +83,8 @@ export const styleSheet = () => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  buttonText: { 
-    color: 'white', 
+  buttonText: {
+    color: 'white',
     fontSize: CONTENT_SPACING_Y / 1.5,
     fontFamily: 'LemonRegular'
   },
