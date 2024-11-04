@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import {
   Camera as RNCamera,
+  useCameraDevice,
   useCameraPermission,
 } from 'react-native-vision-camera';
 import { SumjoModelContext } from '@/context/SumjoModelContext';
@@ -33,6 +34,10 @@ export default function Index(): JSX.Element {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [score, setScore] = useState(0);
   const styles = styleSheet();
+  const position = 'back';
+  const device = useCameraDevice(position, {
+    physicalDevices: ['wide-angle-camera'],
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -54,8 +59,11 @@ export default function Index(): JSX.Element {
   }, [model]);
 
   async function takePhoto() {
-    if (!camera || !camera.current || !isCameraEnabled) return;
-    const photo = await camera.current.takePhoto({ enableShutterSound: false });
+    if (!device || !camera || !camera.current || !isCameraEnabled) return;
+    const photo = await camera.current.takePhoto({
+      enableShutterSound: false,
+      flash: device?.hasFlash ? 'auto' : 'off'
+    });
     const oBoxes = await performDetectionFromUri(
       model?.model as TensorflowModel,
       photo.path
