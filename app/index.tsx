@@ -62,7 +62,7 @@ export default function Index(): JSX.Element {
     if (!device || !camera || !camera.current || !isCameraEnabled) return;
     const photo = await camera.current.takePhoto({
       enableShutterSound: false,
-      flash: device?.hasFlash ? 'auto' : 'off'
+      flash: device?.hasFlash ? 'on' : 'off',
     });
     const oBoxes = await performDetectionFromUri(
       model?.model as TensorflowModel,
