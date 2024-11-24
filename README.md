@@ -20,9 +20,9 @@ SKYJO, a card game developed by Magilano and suitable for players aged 7 to 99, 
 
 ~~The application can be installed via the Google Play Store or Mac App Store on mobile device.~~ --> **Soon**
 
-Please note that it is currently in beta testing phase and not publicly available. To request an invitation to try out Sumjo, send me a message. I will add you to the preview list, allowing you to find Sumjo in Google Play store.
+Please note that it is currently in beta testing phase and not publicly available. To request an invitation to try out Sumjo, send me a message. I will add you to the preview list, allowing you to find Sumjo on the Google Play store.
 
-Alternatively you can build the app yourself, see [⬇️ Use from sources](#use-from-sources) or [releases page](https://github.com/tib0/sumjo/releases) install APK according to the following [how to](https://www.wikihow.com/Install-APK-Files-on-Android).
+Alternatively you can build the app yourself, see [⬇️ Use from sources](#use-from-sources).
 
 ## Screenshots
 
@@ -79,17 +79,27 @@ https://docs.expo.dev/get-started/set-up-your-environment/
 ### For Android:
 
 https://docs.expo.dev/workflow/android-studio-emulator/
+https://docs.expo.dev/more/expo-cli/#compiling-android
 
 ```
 npx expo run:android
+npx expo run:android --variant preview
+npx expo run:android --variant release
+npx expo run:android --no-install --no-bundler --variant preview
+npx expo run:android --no-install --no-bundler --variant release
+
+eas build -p android --profile preview
+eas build -p android --profile release
 ```
 
 ### For iOS:
 
 https://docs.expo.dev/workflow/ios-simulator/
+https://docs.expo.dev/more/expo-cli/#compiling-ios
 
 ```
 npx expo run:ios
+npx expo run:ios --configuration Release --device
 ```
 
 ## License
